@@ -19,3 +19,11 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// The app intentionally uses the legacy architecture until all navigation dependencies
+// support the React Native 0.81 codegen command parser.
+subprojects { subproject ->
+    subproject.tasks.matching { task ->
+        task.name == "generateCodegenSchemaFromJavaScript"
+    }.configureEach { enabled = false }
+}
