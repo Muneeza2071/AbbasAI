@@ -1,0 +1,14 @@
+{
+  "extends": "@react-native/typescript-config/tsconfig.json",
+  "compilerOptions": {
+    "strict": true,
+    "target": "esnext",
+    "moduleResolution": "bundler",
+    "allowJs": false,
+    "jsx": "react-native",
+    "types": ["node"],
+    "skipLibCheck": true
+  },
+  "include": ["App.tsx", "lib/mobile-trpc.ts"],
+  "exclude": ["node_modules", "dist", "android", "ios"]
+}
