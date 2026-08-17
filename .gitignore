@@ -38,9 +38,7 @@ yarn-error.*
 
 app-example
 
-# generated native folders
-/ios
-/android
+# Native project folders are tracked for the bare React Native build.
 
 # IDE
 .vscode/
