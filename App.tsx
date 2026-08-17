@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { createContext, useContext, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -10,9 +10,6 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { mobileTrpc } from './lib/mobile-trpc';
 
@@ -28,15 +25,21 @@ const colors = {
   error: '#FF6B7A',
 };
 
-type RootStackParamList = {
-  Welcome: undefined;
-  Login: undefined;
-  Register: undefined;
-  Main: undefined;
-  Chat: { prompt?: string };
+type RouteName = 'Welcome' | 'Login' | 'Register' | 'Main' | 'Chat';
+type TabName = 'Home' | 'History' | 'Explore' | 'Profile';
+type NavContextValue = {
+  navigate: (name: RouteName | TabName, params?: { prompt?: string }) => void;
+  replace: (name: RouteName) => void;
+  goBack: () => void;
+  tab: TabName;
+  chatPrompt?: string;
 };
-const RootStack = createNativeStackNavigator<RootStackParamList>();
-const Tabs = createBottomTabNavigator();
+const NavContext = createContext<NavContextValue | null>(null);
+function useNav() {
+  const value = useContext(NavContext);
+  if (!value) throw new Error('Navigation context is unavailable');
+  return value;
+}
 
 function Screen({ children }: { children: React.ReactNode }) {
   return (
@@ -70,7 +73,7 @@ function Icon({ label }: { label: string }) {
 }
 
 function Welcome() {
-  const nav = useNavigation<any>();
+  const nav = useNav();
   return (
     <Screen>
       <View style={styles.welcomeTop}>
@@ -108,7 +111,7 @@ function Welcome() {
 }
 
 function AuthForm({ register }: { register: boolean }) {
-  const nav = useNavigation<any>();
+  const nav = useNav();
   return (
     <Screen>
       <KeyboardAvoidingView
@@ -192,7 +195,7 @@ function Field({
 }
 
 function Home() {
-  const nav = useNavigation<any>();
+  const nav = useNav();
   const cards = [
     ['Build something', 'Turn an idea into a clear plan'],
     ['Study smarter', 'Explain any topic simply'],
@@ -256,7 +259,7 @@ function Home() {
 }
 
 function History() {
-  const nav = useNavigation<any>();
+  const nav = useNav();
   return (
     <Screen>
       <ScrollView contentContainerStyle={styles.content}>
@@ -281,7 +284,7 @@ function History() {
   );
 }
 function Explore() {
-  const nav = useNavigation<any>();
+  const nav = useNav();
   const prompts = [
     'Design a clean structure for my next project.',
     'Explain a difficult lesson in simple steps.',
@@ -344,8 +347,8 @@ function Profile() {
   );
 }
 
-function Chat({ route }: { route: { params?: { prompt?: string } } }) {
-  const [input, setInput] = useState(route.params?.prompt ?? '');
+function Chat({ prompt }: { prompt?: string }) {
+  const [input, setInput] = useState(prompt ?? '');
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -437,47 +440,82 @@ function Chat({ route }: { route: { params?: { prompt?: string } } }) {
 }
 
 function MainTabs() {
+  const nav = useNav();
+  const screens = { Home, History, Explore, Profile };
+  const CurrentScreen = screens[nav.tab];
+  const tabs: Array<[TabName, string]> = [
+    ['Home', '⌂'],
+    ['History', '◷'],
+    ['Explore', '✦'],
+    ['Profile', '●'],
+  ];
   return (
-    <Tabs.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {
-          backgroundColor: '#0B0F14',
-          borderTopColor: colors.border,
-        },
-        tabBarActiveTintColor: colors.cyan,
-        tabBarInactiveTintColor: colors.muted,
-      }}
-    >
-      {<Tabs.Screen name="Home" component={Home} />}
-      {<Tabs.Screen name="History" component={History} />}
-      {<Tabs.Screen name="Explore" component={Explore} />}
-      {<Tabs.Screen name="Profile" component={Profile} />}
-    </Tabs.Navigator>
+    <View style={styles.mainShell}>
+      <CurrentScreen />
+      <View style={styles.tabBar}>
+        {tabs.map(([name, icon]) => (
+          <Pressable
+            key={name}
+            onPress={() => nav.navigate(name)}
+            style={[styles.tabItem, nav.tab === name && styles.tabItemActive]}
+          >
+            <Text
+              style={[styles.tabIcon, nav.tab === name && styles.tabIconActive]}
+            >
+              {icon}
+            </Text>
+            <Text
+              style={[
+                styles.tabLabel,
+                nav.tab === name && styles.tabLabelActive,
+              ]}
+            >
+              {name}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+    </View>
   );
 }
 
 export default function App() {
+  const [route, setRoute] = useState<RouteName>('Welcome');
+  const [tab, setTab] = useState<TabName>('Home');
+  const [chatPrompt, setChatPrompt] = useState<string | undefined>();
+  const nav = useMemo<NavContextValue>(
+    () => ({
+      tab,
+      chatPrompt,
+      navigate: (name, params) => {
+        if (
+          name === 'Home' ||
+          name === 'History' ||
+          name === 'Explore' ||
+          name === 'Profile'
+        ) {
+          setTab(name);
+          setRoute('Main');
+          return;
+        }
+        if (name === 'Chat') setChatPrompt(params?.prompt);
+        setRoute(name);
+      },
+      replace: name => setRoute(name),
+      goBack: () => setRoute(route === 'Chat' ? 'Main' : 'Welcome'),
+    }),
+    [chatPrompt, route, tab],
+  );
+
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        <RootStack.Navigator
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: colors.bg },
-          }}
-        >
-          <RootStack.Screen name="Welcome" component={Welcome} />
-          <RootStack.Screen name="Login">
-            {() => <AuthForm register={false} />}
-          </RootStack.Screen>
-          <RootStack.Screen name="Register">
-            {() => <AuthForm register />}
-          </RootStack.Screen>
-          <RootStack.Screen name="Main" component={MainTabs} />
-          <RootStack.Screen name="Chat" component={Chat} />
-        </RootStack.Navigator>
-      </NavigationContainer>
+      <NavContext.Provider value={nav}>
+        {route === 'Welcome' && <Welcome />}
+        {route === 'Login' && <AuthForm register={false} />}
+        {route === 'Register' && <AuthForm register />}
+        {route === 'Main' && <MainTabs />}
+        {route === 'Chat' && <Chat prompt={chatPrompt} />}
+      </NavContext.Provider>
     </SafeAreaProvider>
   );
 }
@@ -689,4 +727,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  mainShell: { flex: 1, backgroundColor: colors.bg },
+  tabBar: {
+    flexDirection: 'row',
+    paddingTop: 8,
+    paddingBottom: Platform.OS === 'android' ? 10 : 20,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    backgroundColor: '#0B0F14',
+  },
+  tabItem: { flex: 1, alignItems: 'center', gap: 3, paddingVertical: 5 },
+  tabItemActive: {
+    backgroundColor: '#13242D',
+    borderRadius: 12,
+    marginHorizontal: 4,
+  },
+  tabIcon: { color: colors.muted, fontSize: 18, fontWeight: '800' },
+  tabIconActive: { color: colors.cyan },
+  tabLabel: { color: colors.muted, fontSize: 10, fontWeight: '700' },
+  tabLabelActive: { color: colors.cyan },
 });
