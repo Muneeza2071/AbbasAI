@@ -49,6 +49,11 @@
 - [x] Validate direct Android build and confirm no secrets are committed (Gradle build deferred locally because Android SDK is unavailable; GitHub Actions installs SDK components)
 - [ ] Save a direct React Native Android checkpoint
 
-- [ ] Confirm the newly authorized GitHub connector targets `Muneeza2071/AbbasAI`
-- [ ] Push the direct React Native Android project and workflow to the selected repository
-- [ ] Verify the pushed commit and GitHub Actions workflow
+- [x] Confirm the newly authorized GitHub connector targets `Muneeza2071/AbbasAI`
+- [x] Push the direct React Native Android project and workflow to the selected repository
+- [x] Verify the pushed commit and GitHub Actions workflow
+
+- [ ] Fix GitHub Actions failure: runner cannot locate the `pnpm` executable
+- [ ] Replace deprecated Node 20 GitHub action versions where supported
+- [ ] Validate the corrected Android workflow locally and push a fix commit
+- [ ] Verify the next GitHub Actions run reaches dependency installation and Android build steps
