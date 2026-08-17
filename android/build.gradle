@@ -24,6 +24,6 @@ apply plugin: "com.facebook.react.rootproject"
 // support the React Native 0.81 codegen command parser.
 subprojects { subproject ->
     subproject.tasks.matching { task ->
-        task.name == "generateCodegenSchemaFromJavaScript"
+        task.name.contains("generateCodegen")
     }.configureEach { enabled = false }
 }
