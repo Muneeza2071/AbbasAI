@@ -11,7 +11,6 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { mobileTrpc } from './lib/mobile-trpc';
 
 const colors = {
   bg: '#07090C',
@@ -366,6 +365,7 @@ function Chat({ prompt }: { prompt?: string }) {
     setPending(true);
     setError(false);
     try {
+      const { mobileTrpc } = await import('./lib/mobile-trpc');
       const result = await mobileTrpc.ai.chat.mutate({
         messages: next.map(m => ({
           role: m.role as 'user' | 'assistant',

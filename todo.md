@@ -77,7 +77,17 @@
 - [ ] Build and install-test a corrected APK after the evidence-based fix
 - [ ] Verify opening the app and sending a live AI message on the corrected build
 
-- [ ] Test a JSC-based release APK for the Galaxy A21s Android 12 launch crash
-- [ ] Verify the JSC build is self-contained and includes the JavaScript bundle
-- [ ] Verify the live built-in AI request path on the JSC build
-- [ ] Push and deliver the JSC APK if the engine fallback resolves launch
+- [x] Test a JSC-based release APK for the Galaxy A21s Android 12 launch crash
+- [x] Verify the JSC build is self-contained and includes the JavaScript bundle
+- [x] Verify the live built-in AI request path on the JSC build
+- [x] Push and deliver the JSC APK if the engine fallback resolves launch
+
+- [ ] Obtain a usable Android crash report from the Galaxy A21s device
+- [ ] Identify the native startup exception from the crash report
+- [ ] Apply only an evidence-based startup fix
+- [ ] Rebuild and verify the APK after the evidence-based fix
+
+- [ ] Audit the migrated MainApplication, MainActivity, manifest, and release startup configuration
+- [ ] Simplify native startup to the minimal React Native Android template path
+- [ ] Rebuild and validate the APK with the built-in AI route preserved
+- [ ] Push and deliver the app-side crash fix
