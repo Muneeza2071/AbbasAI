@@ -98,3 +98,10 @@
 - [x] Convert Abbas AI from native Android delivery to a mobile-first web app/PWA
 - [x] Preserve carbon-glass design, custom navigation, and secure server-side AI chat on the web
 - [x] Validate the website on mobile and desktop widths and save a browser-ready checkpoint
+
+- [ ] Add a Multimedia workspace with Voice, Image, Video, Slides, and 3D tools
+- [ ] Add browser voice recording/transcription and optional spoken replies without exposing keys
+- [ ] Add server-side image generation and structured slide/code generation routes
+- [ ] Add code blocks with syntax highlighting, one-tap copy, language labels, and sandboxed preview
+- [ ] Add interactive 3D visual effects with reduced-motion fallback
+- [ ] Validate multimedia flows, responsive layout, API errors, and save a checkpoint

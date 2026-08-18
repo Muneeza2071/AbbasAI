@@ -1,99 +1,48 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 
-type Tab = 'home' | 'history' | 'explore' | 'profile';
+type Tab = 'home' | 'history' | 'explore' | 'workspace' | 'profile';
 type Message = { role: 'user' | 'assistant'; content: string };
+type Tool = 'voice' | 'image' | 'video' | 'slides' | 'code' | '3d';
 
 const prompts = ['Explain a complex idea simply', 'Review my code', 'Create a focused study plan', 'Help me brainstorm'];
+const starterCode = `export default function AbbasCard() {\n  return (\n    <section className="card">\n      <h1>Build something focused.</h1>\n      <p>Preview your idea instantly.</p>\n    </section>\n  );\n}`;
 
 async function askAbbas(messages: Message[]) {
-  const response = await fetch('/api/trpc/ai.chat?batch=1', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ 0: { json: { messages } } }),
-  });
+  const response = await fetch('/api/trpc/ai.chat?batch=1', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ 0: { json: { messages } } }) });
   if (!response.ok) throw new Error('The AI service is temporarily unavailable.');
-  const payload = await response.json();
-  const data = payload?.[0]?.result?.data;
-  const result = data?.json ?? data;
-  if (!result?.text) throw new Error('The AI returned an empty response.');
-  return result.text as string;
+  const payload = await response.json(); const data = payload?.[0]?.result?.data; const result = data?.json ?? data;
+  if (!result?.text) throw new Error('The AI returned an empty response.'); return result.text as string;
 }
 
 function App() {
-  const [tab, setTab] = useState<Tab>('home');
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [draft, setDraft] = useState('');
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState('');
-
-  const greeting = useMemo(() => {
-    const hour = new Date().getHours();
-    return hour < 12 ? 'Good morning, Abbas.' : hour < 18 ? 'Good afternoon, Abbas.' : 'Good evening, Abbas.';
-  }, []);
-
-  const send = async (value = draft) => {
-    const content = value.trim();
-    if (!content || pending) return;
-    const next = [...messages, { role: 'user' as const, content }];
-    setMessages(next);
-    setDraft('');
-    setError('');
-    setPending(true);
-    setTab('history');
-    try {
-      const text = await askAbbas(next);
-      setMessages([...next, { role: 'assistant', content: text }]);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong.');
-    } finally {
-      setPending(false);
-    }
-  };
-
-  const startChat = (prompt?: string) => {
-    setTab('history');
-    if (prompt) setDraft(prompt);
-  };
-
-  return (
-    <div className="app-shell">
-      <div className="ambient ambient-one" />
-      <div className="ambient ambient-two" />
-      <main className="app-main">
-        {tab === 'home' && <Home greeting={greeting} onStart={startChat} />}
-        {tab === 'history' && <Chat messages={messages} draft={draft} setDraft={setDraft} pending={pending} error={error} onSend={send} />}
-        {tab === 'explore' && <Explore onStart={startChat} />}
-        {tab === 'profile' && <Profile />}
-      </main>
-      <nav className="bottom-nav" aria-label="Main navigation">
-        {([['home', '⌂', 'Home'], ['history', '◌', 'Chat'], ['explore', '✦', 'Explore'], ['profile', '◉', 'Profile']] as const).map(([key, icon, label]) => (
-          <button className={tab === key ? 'nav-item active' : 'nav-item'} key={key} onClick={() => setTab(key)}>
-            <span className="nav-icon">{icon}</span><span>{label}</span>
-          </button>
-        ))}
-      </nav>
-    </div>
-  );
+  const [tab, setTab] = useState<Tab>('home'); const [messages, setMessages] = useState<Message[]>([]); const [draft, setDraft] = useState(''); const [pending, setPending] = useState(false); const [error, setError] = useState('');
+  const greeting = useMemo(() => { const hour = new Date().getHours(); return hour < 12 ? 'Good morning, Abbas.' : hour < 18 ? 'Good afternoon, Abbas.' : 'Good evening, Abbas.'; }, []);
+  const send = async (value = draft) => { const content = value.trim(); if (!content || pending) return; const next = [...messages, { role: 'user' as const, content }]; setMessages(next); setDraft(''); setError(''); setPending(true); setTab('history'); try { const text = await askAbbas(next); setMessages([...next, { role: 'assistant', content: text }]); } catch (err) { setError(err instanceof Error ? err.message : 'Something went wrong.'); } finally { setPending(false); } };
+  const startChat = (prompt?: string) => { setTab('history'); if (prompt) setDraft(prompt); };
+  return <div className="app-shell"><div className="ambient ambient-one" /><div className="ambient ambient-two" /><main className="app-main">{tab === 'home' && <Home greeting={greeting} onStart={startChat} />}{tab === 'history' && <Chat messages={messages} draft={draft} setDraft={setDraft} pending={pending} error={error} onSend={send} />}{tab === 'explore' && <Explore onStart={startChat} />}{tab === 'workspace' && <Workspace />}{tab === 'profile' && <Profile />}</main><nav className="bottom-nav" aria-label="Main navigation">{([['home', '⌂', 'Home'], ['history', '◌', 'Chat'], ['explore', '✦', 'Explore'], ['workspace', '⌘', 'Create'], ['profile', '◉', 'Profile']] as const).map(([key, icon, label]) => <button className={tab === key ? 'nav-item active' : 'nav-item'} key={key} onClick={() => setTab(key)}><span className="nav-icon">{icon}</span><span>{label}</span></button>)}</nav></div>;
 }
 
-function Home({ greeting, onStart }: { greeting: string; onStart: (prompt?: string) => void }) {
-  return <section className="page home-page">
-    <div className="topline"><div className="brand-mark">✦</div><span className="brand-name">ABBAS AI</span><button className="ghost-icon" onClick={() => onStart()}>＋</button></div>
-    <div className="hero-copy"><span className="eyebrow">YOUR FOCUSED AI WORKSPACE</span><h1>{greeting}</h1><p>Think clearly. Build boldly.<br />Make your next idea real.</p></div>
-    <button className="primary-cta" onClick={() => onStart()}><span>Start a new conversation</span><b>↗</b></button>
-    <div className="section-heading"><span>Quick prompts</span><small>Pick a direction</small></div>
-    <div className="prompt-grid">{prompts.map((prompt, index) => <button className="prompt-card" key={prompt} onClick={() => onStart(prompt)}><span className={`prompt-orb orb-${index}`}>{['✦', '⌘', '◈', '✧'][index]}</span><strong>{prompt}</strong><span className="arrow">↗</span></button>)}</div>
-    <div className="insight-card"><div><span className="eyebrow">ABBTAS AI / NOTE</span><h3>A calm interface for serious thinking.</h3><p>Your conversations stay focused, simple, and ready when you are.</p></div><span className="insight-mark">◒</span></div>
-  </section>;
-}
+function Home({ greeting, onStart }: { greeting: string; onStart: (prompt?: string) => void }) { return <section className="page home-page"><div className="topline"><div className="brand-mark">✦</div><span className="brand-name">ABBAS AI</span><button className="ghost-icon" onClick={() => onStart()}>＋</button></div><div className="hero-copy"><span className="eyebrow">YOUR FOCUSED AI WORKSPACE</span><h1>{greeting}</h1><p>Think clearly. Build boldly.<br />Make your next idea real.</p></div><button className="primary-cta" onClick={() => onStart()}><span>Start a new conversation</span><b>↗</b></button><div className="section-heading"><span>Quick prompts</span><small>Pick a direction</small></div><div className="prompt-grid">{prompts.map((prompt, index) => <button className="prompt-card" key={prompt} onClick={() => onStart(prompt)}><span className={`prompt-orb orb-${index}`}>{['✦', '⌘', '◈', '✧'][index]}</span><strong>{prompt}</strong><span className="arrow">↗</span></button>)}</div><div className="insight-card"><div><span className="eyebrow">ABBAS AI / NOTE</span><h3>A calm interface for serious thinking.</h3><p>Your conversations stay focused, simple, and ready when you are.</p></div><span className="insight-mark">◒</span></div></section>; }
 
-function Chat({ messages, draft, setDraft, pending, error, onSend }: { messages: Message[]; draft: string; setDraft: (v: string) => void; pending: boolean; error: string; onSend: () => void }) {
-  return <section className="page chat-page"><div className="page-header"><div><span className="eyebrow">PRIVATE WORKSPACE</span><h2>Conversation</h2></div><span className="status-dot">● Online</span></div><div className="chat-scroll">{messages.length === 0 ? <div className="empty-chat"><div className="large-mark">✦</div><h3>What are you working on?</h3><p>Ask Abbas AI anything. Your first message starts the conversation.</p></div> : messages.map((message, index) => <div className={`bubble-row ${message.role}`} key={`${message.role}-${index}`}><div className="bubble"><span className="bubble-label">{message.role === 'user' ? 'YOU' : 'ABBAS AI'}</span><p>{message.content}</p></div></div>)}{pending && <div className="bubble-row assistant"><div className="bubble"><span className="bubble-label">ABBAS AI</span><p className="typing">Thinking<span>.</span><span>.</span><span>.</span></p></div></div>}</div>{error && <div className="error-banner">{error} <button onClick={onSend}>Retry</button></div>}<div className="composer"><textarea value={draft} onChange={event => setDraft(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); onSend(); } }} placeholder="Message Abbas AI..." rows={1} /><button className="send-button" onClick={onSend} disabled={pending || !draft.trim()}>↗</button></div></section>;
-}
+function Chat({ messages, draft, setDraft, pending, error, onSend }: { messages: Message[]; draft: string; setDraft: (v: string) => void; pending: boolean; error: string; onSend: () => void }) { return <section className="page chat-page"><div className="page-header"><div><span className="eyebrow">PRIVATE WORKSPACE</span><h2>Conversation</h2></div><span className="status-dot">● Online</span></div><div className="chat-scroll">{messages.length === 0 ? <div className="empty-chat"><div className="large-mark">✦</div><h3>What are you working on?</h3><p>Ask Abbas AI anything. Your first message starts the conversation.</p></div> : messages.map((message, index) => <div className={`bubble-row ${message.role}`} key={`${message.role}-${index}`}><div className="bubble"><span className="bubble-label">{message.role === 'user' ? 'YOU' : 'ABBAS AI'}</span><p>{message.content}</p></div></div>)}{pending && <div className="bubble-row assistant"><div className="bubble"><span className="bubble-label">ABBAS AI</span><p className="typing">Thinking<span>.</span><span>.</span><span>.</span></p></div></div>}</div>{error && <div className="error-banner">{error} <button onClick={onSend}>Retry</button></div>}<div className="composer"><textarea value={draft} onChange={event => setDraft(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); onSend(); } }} placeholder="Message Abbas AI..." rows={1} /><button className="send-button" onClick={onSend} disabled={pending || !draft.trim()}>↗</button></div></section>; }
 
 function Explore({ onStart }: { onStart: (prompt?: string) => void }) { return <section className="page"><div className="page-header"><div><span className="eyebrow">PROMPT LIBRARY</span><h2>Explore</h2></div><span className="page-count">04</span></div><p className="lead">Useful starting points for your next focused session.</p><div className="explore-list">{prompts.concat(['Turn notes into a clear plan']).map((prompt, index) => <button className="explore-row" key={prompt} onClick={() => onStart(prompt)}><span className="row-number">0{index + 1}</span><span>{prompt}</span><b>↗</b></button>)}</div></section>; }
+
+function Workspace() {
+  const [tool, setTool] = useState<Tool>('image'); const [code, setCode] = useState(starterCode); const [copied, setCopied] = useState(false); const [recording, setRecording] = useState(false); const [voiceText, setVoiceText] = useState(''); const mediaRecorder = useRef<MediaRecorder | null>(null); const chunks = useRef<Blob[]>([]);
+  const copyCode = async () => { await navigator.clipboard.writeText(code); setCopied(true); setTimeout(() => setCopied(false), 1500); };
+  const toggleVoice = async () => { if (recording) { mediaRecorder.current?.stop(); setRecording(false); return; } const stream = await navigator.mediaDevices.getUserMedia({ audio: true }); const recorder = new MediaRecorder(stream); chunks.current = []; recorder.ondataavailable = event => chunks.current.push(event.data); recorder.onstop = async () => { stream.getTracks().forEach(track => track.stop()); const blob = new Blob(chunks.current, { type: recorder.mimeType || 'audio/webm' }); const reader = new FileReader(); reader.onloadend = async () => { const base64 = String(reader.result).split(',')[1]; try { const response = await fetch('/api/trpc/voice.transcribeBase64?batch=1', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ 0: { json: { audioBase64: base64, mimeType: blob.type || 'audio/webm', language: 'en' } } }) }); const payload = await response.json(); const data = payload?.[0]?.result?.data; const result = data?.json ?? data; if (!response.ok || !result?.text) throw new Error('Voice transcription failed.'); setVoiceText(result.text); } catch (error) { setVoiceText(error instanceof Error ? error.message : 'Voice transcription failed.'); } }; reader.readAsDataURL(blob); }; recorder.start(); mediaRecorder.current = recorder; setVoiceText(''); setRecording(true); };
+  const tools: [Tool, string, string][] = [['voice', '◉', 'Voice'], ['image', '✦', 'Image'], ['video', '▶', 'Video'], ['slides', '▤', 'Slides'], ['code', '⌘', 'Code'], ['3d', '◇', '3D Lab']];
+  return <section className="page workspace-page"><div className="page-header"><div><span className="eyebrow">CREATE LAB</span><h2>Make something.</h2></div><span className="status-dot">● Ready</span></div><div className="tool-grid">{tools.map(([key, icon, label]) => <button key={key} className={tool === key ? 'tool-card selected' : 'tool-card'} onClick={() => setTool(key)}><span>{icon}</span><b>{label}</b></button>)}</div>{tool === 'code' ? <CodeLab code={code} setCode={setCode} copied={copied} onCopy={copyCode} /> : tool === 'voice' ? <VoiceLab recording={recording} onToggle={toggleVoice} text={voiceText} /> : <GenerationLab tool={tool} />}</section>;
+}
+
+function GenerationLab({ tool }: { tool: Tool }) { const info: Record<string, [string, string, string]> = { image: ['Image studio', 'Describe an image and Abbas AI will turn the idea into a visual.', 'Generate image'], video: ['Video maker', 'Plan a short cinematic clip with a clear scene, motion, and mood.', 'Create storyboard'], slides: ['Slide builder', 'Turn a topic into a polished, editable presentation outline.', 'Build slides'], '3d': ['3D motion lab', 'Experiment with depth, glow, rotation, and interactive visual effects.', 'Open 3D lab'] }; const [title, copy, action] = info[tool] ?? info.image; const [prompt, setPrompt] = useState(''); const [pending, setPending] = useState(false); const [error, setError] = useState(''); const [result, setResult] = useState<{ url?: string; title?: string; items?: Array<{ heading: string; description: string }> } | null>(null); const run = async () => { if (!prompt.trim() || pending || tool === '3d') return; setPending(true); setError(''); setResult(null); try { const route = tool === 'image' ? 'image' : 'plan'; const input = tool === 'image' ? { prompt } : { kind: tool, prompt }; const response = await fetch(`/api/trpc/media.${route}?batch=1`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ 0: { json: input } }) }); const payload = await response.json(); if (!response.ok || payload?.[0]?.error) throw new Error(payload?.[0]?.error?.json?.message || 'Generation failed.'); const data = payload?.[0]?.result?.data; setResult(data?.json ?? data); } catch (err) { setError(err instanceof Error ? err.message : 'Generation failed.'); } finally { setPending(false); } }; return <div className="creation-panel"><div className={`creation-preview preview-${tool}`}>{result?.url ? <img className="generated-image" src={result.url} alt={prompt} /> : <><span className="preview-orb">{tool === '3d' ? '◇' : tool === 'video' ? '▶' : tool === 'slides' ? '▤' : '✦'}</span><span>{tool === 'image' ? 'VISUAL CANVAS' : tool.toUpperCase()}</span></>}</div><span className="eyebrow">{tool.toUpperCase()} GENERATOR</span><h3>{title}</h3><p>{copy}</p><textarea className="generation-input" value={prompt} onChange={event => setPrompt(event.target.value)} placeholder={`Describe your ${tool} idea...`} rows={3} /><button className="primary-cta" onClick={run} disabled={pending || !prompt.trim() || tool === '3d'}><span>{pending ? 'Working...' : action}</span><b>↗</b></button>{error && <div className="error-banner">{error}</div>}{result?.items && <div className="plan-result"><b>{result.title}</b>{result.items.map((item, index) => <div key={item.heading}><span>0{index + 1}</span><p><strong>{item.heading}</strong>{item.description}</p></div>)}</div>}<small className="feature-note">Server-side generation keeps provider credentials out of the browser.</small></div>; }
+
+function VoiceLab({ recording, onToggle, text }: { recording: boolean; onToggle: () => void; text: string }) { return <div className="creation-panel voice-panel"><div className={recording ? 'voice-ring recording' : 'voice-ring'}>◉</div><span className="eyebrow">VOICE WORKSPACE</span><h3>{recording ? 'Listening now.' : 'Talk to Abbas AI.'}</h3><p>{recording ? 'Tap stop when you are finished. Audio will be transcribed securely.' : 'Record a voice note, transcribe it, and continue the conversation hands-free.'}</p><button className={recording ? 'primary-cta stop-voice' : 'primary-cta'} onClick={onToggle}><span>{recording ? 'Stop recording' : 'Start recording'}</span><b>◉</b></button>{text && <div className="voice-transcript"><span>TRANSCRIPT</span><p>{text}</p></div>}<small className="feature-note">Microphone permission is requested only after you tap Start.</small></div>; }
+
+function CodeLab({ code, setCode, copied, onCopy }: { code: string; setCode: (value: string) => void; copied: boolean; onCopy: () => void }) { const preview = `<!doctype html><html><style>body{margin:0;padding:24px;background:#0b1117;color:#eaf5f7;font:16px system-ui}.card{padding:24px;border:1px solid #3b7580;border-radius:18px;background:linear-gradient(135deg,#152f38,#131823)}h1{font-size:22px;margin:0 0 8px}p{color:#9bb0b8}</style><body><section class="card"><h1>Build something focused.</h1><p>Preview your idea instantly.</p></section></body></html>`; return <div className="code-lab"><div className="code-toolbar"><span><i className="language-dot" /> JSX / React</span><button onClick={onCopy}>{copied ? 'Copied' : 'Copy code'}</button></div><textarea className="code-editor" value={code} onChange={event => setCode(event.target.value)} spellCheck={false} aria-label="Code editor" /><div className="preview-heading"><span>Live preview</span><small>Sandboxed iframe</small></div><iframe className="code-preview" title="Code preview" sandbox="allow-scripts" srcDoc={preview} /></div>; }
 function Profile() { return <section className="page"><div className="page-header"><div><span className="eyebrow">YOUR SPACE</span><h2>Profile</h2></div><div className="avatar">A</div></div><div className="profile-card"><div className="profile-avatar">A</div><div><h3>Abbas Hussain</h3><p>Full Stack Web Developer</p></div><span className="verified">✓</span></div><div className="settings-list"><div><span>◌</span><b>Private by design</b><small>Server-side AI boundary enabled</small></div><div><span>⌁</span><b>Carbon glass theme</b><small>Deep focus, low distraction</small></div><div><span>↗</span><b>About Abbas AI</b><small>Version 1.0 · Built for ideas</small></div></div></section>; }
 
 createRoot(document.getElementById('root')!).render(<App />);
