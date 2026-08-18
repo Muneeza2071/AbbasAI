@@ -112,3 +112,7 @@
 - [x] Reproduce and diagnose 3D Lab failure
 - [x] Fix all four tools with visible results, errors, retry, and responsive behavior
 - [x] Re-run browser/API validation and save a verified checkpoint
+
+- [x] Add selectable syntax-highlighting themes to Code Lab
+- [x] Add HTML and CSS code modes with live-preview toggle
+- [x] Validate theme switching, code editing, preview toggle, and responsive behavior
