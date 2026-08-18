@@ -92,5 +92,9 @@
 - [x] Rebuild and validate the APK with the built-in AI route preserved
 - [x] Push and deliver the app-side crash fix
 
-- [ ] Update GitHub Actions Android/setup and artifact actions to remove the Node.js deprecation warning
-- [ ] Verify the updated workflow still produces the self-contained release APK without warnings
+- [x] Update GitHub Actions Android/setup and artifact actions to remove the Node.js deprecation warning
+- [x] Verify the updated workflow still produces the self-contained release APK without warnings
+
+- [x] Convert Abbas AI from native Android delivery to a mobile-first web app/PWA
+- [x] Preserve carbon-glass design, custom navigation, and secure server-side AI chat on the web
+- [x] Validate the website on mobile and desktop widths and save a browser-ready checkpoint

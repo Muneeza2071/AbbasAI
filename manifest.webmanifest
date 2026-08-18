@@ -1,0 +1,10 @@
+{
+  "name": "Abbas AI",
+  "short_name": "Abbas AI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07090c",
+  "theme_color": "#07090c",
+  "description": "A focused AI workspace for ideas, code, study, and momentum.",
+  "icons": []
+}
