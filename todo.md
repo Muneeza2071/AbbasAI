@@ -53,7 +53,13 @@
 - [x] Push the direct React Native Android project and workflow to the selected repository
 - [x] Verify the pushed commit and GitHub Actions workflow
 
-- [ ] Fix GitHub Actions failure: runner cannot locate the `pnpm` executable
-- [ ] Replace deprecated Node 20 GitHub action versions where supported
-- [ ] Validate the corrected Android workflow locally and push a fix commit
-- [ ] Verify the next GitHub Actions run reaches dependency installation and Android build steps
+- [x] Fix GitHub Actions failure: runner cannot locate the `pnpm` executable
+- [x] Replace deprecated Node 20 GitHub action versions where supported
+- [x] Validate the corrected Android workflow locally and push a fix commit
+- [x] Verify the next GitHub Actions run reaches dependency installation and Android build steps
+
+- [ ] Reproduce and diagnose the installed APK launch crash
+- [ ] Fix the Android launch crash without adding Grok or OpenRouter credentials
+- [ ] Verify the server-side built-in AI reply flow from the Android client
+- [ ] Run TypeScript, AI tests, and GitHub Android APK build validation
+- [ ] Push the crash fix and deliver a corrected APK artifact
