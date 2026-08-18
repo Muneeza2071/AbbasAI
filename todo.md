@@ -99,9 +99,16 @@
 - [x] Preserve carbon-glass design, custom navigation, and secure server-side AI chat on the web
 - [x] Validate the website on mobile and desktop widths and save a browser-ready checkpoint
 
-- [ ] Add a Multimedia workspace with Voice, Image, Video, Slides, and 3D tools
-- [ ] Add browser voice recording/transcription and optional spoken replies without exposing keys
-- [ ] Add server-side image generation and structured slide/code generation routes
-- [ ] Add code blocks with syntax highlighting, one-tap copy, language labels, and sandboxed preview
-- [ ] Add interactive 3D visual effects with reduced-motion fallback
-- [ ] Validate multimedia flows, responsive layout, API errors, and save a checkpoint
+- [x] Add a Multimedia workspace with Voice, Image, Video, Slides, and 3D tools
+- [x] Add browser voice recording/transcription and optional spoken replies without exposing keys
+- [x] Add server-side image generation and structured slide/code generation routes
+- [x] Add code blocks with syntax highlighting, one-tap copy, language labels, and sandboxed preview
+- [x] Add interactive 3D visual effects with reduced-motion fallback
+- [x] Validate multimedia flows, responsive layout, API errors, and save a checkpoint
+
+- [x] Reproduce and diagnose Image Lab failure
+- [x] Reproduce and diagnose Slides Lab failure
+- [x] Reproduce and diagnose Video Lab failure
+- [x] Reproduce and diagnose 3D Lab failure
+- [x] Fix all four tools with visible results, errors, retry, and responsive behavior
+- [x] Re-run browser/API validation and save a verified checkpoint
