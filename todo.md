@@ -91,3 +91,6 @@
 - [x] Simplify native startup to the minimal React Native Android template path
 - [x] Rebuild and validate the APK with the built-in AI route preserved
 - [x] Push and deliver the app-side crash fix
+
+- [ ] Update GitHub Actions Android/setup and artifact actions to remove the Node.js deprecation warning
+- [ ] Verify the updated workflow still produces the self-contained release APK without warnings
