@@ -87,7 +87,7 @@
 - [ ] Apply only an evidence-based startup fix
 - [ ] Rebuild and verify the APK after the evidence-based fix
 
-- [ ] Audit the migrated MainApplication, MainActivity, manifest, and release startup configuration
-- [ ] Simplify native startup to the minimal React Native Android template path
-- [ ] Rebuild and validate the APK with the built-in AI route preserved
-- [ ] Push and deliver the app-side crash fix
+- [x] Audit the migrated MainApplication, MainActivity, manifest, and release startup configuration
+- [x] Simplify native startup to the minimal React Native Android template path
+- [x] Rebuild and validate the APK with the built-in AI route preserved
+- [x] Push and deliver the app-side crash fix
