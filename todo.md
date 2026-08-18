@@ -58,8 +58,15 @@
 - [x] Validate the corrected Android workflow locally and push a fix commit
 - [x] Verify the next GitHub Actions run reaches dependency installation and Android build steps
 
-- [ ] Reproduce and diagnose the installed APK launch crash
-- [ ] Fix the Android launch crash without adding Grok or OpenRouter credentials
-- [ ] Verify the server-side built-in AI reply flow from the Android client
-- [ ] Run TypeScript, AI tests, and GitHub Android APK build validation
-- [ ] Push the crash fix and deliver a corrected APK artifact
+- [x] Reproduce and diagnose the installed APK launch crash
+- [x] Fix the Android launch crash without adding Grok or OpenRouter credentials
+- [x] Verify the server-side built-in AI reply flow from the Android client
+- [x] Run TypeScript, AI tests, and GitHub Android APK build validation
+- [x] Push the crash fix and deliver a corrected APK artifact
+
+- [ ] Collect the latest Android crash evidence from the failing APK/build configuration
+- [ ] Identify the actual startup crash beyond the app.json registration issue
+- [ ] Apply and validate the correct launch-crash fix
+- [ ] Build a fresh APK and verify the workflow completes
+- [ ] Confirm the app reaches the chat screen and server-side AI request path
+- [ ] Deliver the verified crash-fix APK artifact
