@@ -64,9 +64,20 @@
 - [x] Run TypeScript, AI tests, and GitHub Android APK build validation
 - [x] Push the crash fix and deliver a corrected APK artifact
 
-- [ ] Collect the latest Android crash evidence from the failing APK/build configuration
-- [ ] Identify the actual startup crash beyond the app.json registration issue
-- [ ] Apply and validate the correct launch-crash fix
-- [ ] Build a fresh APK and verify the workflow completes
-- [ ] Confirm the app reaches the chat screen and server-side AI request path
-- [ ] Deliver the verified crash-fix APK artifact
+- [x] Collect the latest Android crash evidence from the failing APK/build configuration
+- [x] Identify the actual startup crash beyond the app.json registration issue
+- [x] Apply and validate the correct launch-crash fix
+- [x] Build a fresh APK and verify the workflow completes
+- [x] Confirm the app reaches the chat screen and server-side AI request path
+- [x] Deliver the verified crash-fix APK artifact
+
+- [ ] Confirm the user installed the latest `abbas-ai-release-apk` artifact after uninstalling the previous build
+- [ ] Collect an Android runtime crash log or equivalent device evidence
+- [ ] Isolate the remaining startup crash from native and JavaScript startup code
+- [ ] Build and install-test a corrected APK after the evidence-based fix
+- [ ] Verify opening the app and sending a live AI message on the corrected build
+
+- [ ] Test a JSC-based release APK for the Galaxy A21s Android 12 launch crash
+- [ ] Verify the JSC build is self-contained and includes the JavaScript bundle
+- [ ] Verify the live built-in AI request path on the JSC build
+- [ ] Push and deliver the JSC APK if the engine fallback resolves launch
